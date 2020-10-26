@@ -1,0 +1,23 @@
+{
+  "name": "SnakeHunt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "matter-js": "^0.14.2",
+    "physicsjs": "^0.7.0",
+    "socket-io": "^1.0.0",
+    "socket.io": "^1.7.4"
+  },
+  "engines": {
+    "node": "12.16.x",
+    "npm": "6.13.x"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

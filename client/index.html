@@ -1,0 +1,298 @@
+<title>Snake Hunt</title>
+
+<link href='https://fonts.googleapis.com/css?family=Nunito' rel='stylesheet'>
+<link type="text/css" href="css/styles.css" rel="stylesheet">
+
+<body>
+	<div id="login">
+		<div>
+			<h1 id="title">Snake Hunt</h1>
+			<input id="enterName" type="text" maxlength="12"><br>
+		</div>
+		<div style="height:6%"></div>
+		<button id="loginButton" onclick="attemptLogin()">Login</button><br>
+		<h1 style="height:6%;color:#FF8484" id="error"></h1>
+		<svg>
+			<a id="left" href="#">
+				<polygon points="93.62,0, 93.62,70, 33,35" style="stroke:white;stroke-width:1"/>
+			</a>
+			<polygon id="chooseColour" points="120,0, 190,0, 190,70, 120,70" style="fill:'#050732';stroke:white;stroke-width:3"/>
+			<a id="right" href="#">
+				<polygon points="215,0, 215,70, 275.62,35" style="stroke:white;stroke-width:1"/>
+			</a>
+		</svg>
+	</div>
+</body>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="client/p5.js"></script>
+<script src="client/colours.js"></script>
+
+<script>
+
+	//Create Client ---------------------------------------------------------------------------
+
+	var socket = io();
+
+	var playerId;
+
+	var width;
+	var height;
+
+	var sideWidth;
+	var gameDimension;
+	var titleDimension;
+
+	var grid = null;
+	var gridSize = 11;
+
+	var gameCanvas;
+	var leftCanvas;
+	var rightCanvas;
+	var titleCanvas;
+
+	var newKey = "right";
+	var isDead = false;
+
+	var backgroundColour = "#001C57";
+
+	var loggedIn = false;
+	var inGame = false;
+
+	var colourId;
+	var scores;
+
+	//Login ----------------------------------------------------------------
+
+	document.getElementById('right').addEventListener('click', () => {
+		socket.emit("nextColour","right",colourId);
+	});
+
+	document.getElementById('left').addEventListener('click', () => {
+		socket.emit("nextColour","left",colourId);
+	});
+
+	function attemptLogin(){
+		var username = document.getElementById("enterName").value;
+		socket.emit("checkName",username,colourId);
+	}
+
+	function newDisplayColour(boxColour){
+		var box = document.getElementById("chooseColour");
+		box.style.fill = boxColour;
+	}
+
+	//Canvas Functions ---------------------------------------------------------------
+
+	function updateCanvasSize(){
+		width = windowWidth;
+		height = windowHeight;
+		gameDimension = height - 40;
+		sideWidth = ((width - gameDimension) / 2) - 40;
+	}
+
+	function newCanvas(){
+		titleCanvas = createGraphics(gameDimension,gameDimension);
+		titleCanvas.rectMode(CENTER);
+		titleCanvas.textAlign(CENTER, CENTER);
+
+		gameCanvas = createGraphics(gameDimension,gameDimension);
+		gameCanvas.rectMode(CENTER);
+		gameCanvas.textAlign(CENTER, CENTER);
+
+		leftCanvas = createGraphics(sideWidth,gameDimension);
+		leftCanvas.rectMode(CORNER);
+		leftCanvas.textAlign(CENTER, CENTER);
+		leftCanvas.rectMode(CORNER);
+		leftCanvas.textAlign(CENTER, TOP);
+		leftCanvas.textSize(40);
+		leftCanvas.fill(255);
+		leftCanvas.textFont("Nunito");
+
+		rightCanvas = createGraphics(sideWidth,gameDimension);
+		rightCanvas.rectMode(CORNER);
+		rightCanvas.textAlign(CENTER, TOP);
+		rightCanvas.textSize(40);
+		rightCanvas.fill(255);
+		rightCanvas.textFont("Nunito");
+	}
+
+	//Setup / Resize canvas -------------------------------------------------------------
+
+	function setup(){
+		//Left Empty
+	}
+
+	function game(){
+		updateCanvasSize();
+		createCanvas(width, height);
+		background(backgroundColour);
+		newCanvas();
+	}
+
+	function windowResized(){
+		if(loggedIn){
+			updateCanvasSize();
+			resizeCanvas(width, height);
+			background(backgroundColour);
+			gameCanvas.canvas.remove();
+			leftCanvas.canvas.remove();
+			rightCanvas.canvas.remove();
+			newCanvas();
+		}
+	}
+
+	//Player Inputs ------------------------------------------------------------
+
+	function keyPressed(){
+		if(loggedIn){
+			if(keyCode === 32){
+				socket.emit("start");
+			}
+		}
+		if(inGame){
+			if(!isDead){
+				if(keyCode === 87 || keyCode === 38){
+					newKey = "up";
+					socket.emit("getInputs",newKey,playerId);
+				} else if(keyCode === 65 || keyCode === 37){
+					newKey = "left";
+					socket.emit("getInputs",newKey,playerId);
+				} else if(keyCode === 83 || keyCode === 40){
+					newKey = "down";
+					socket.emit("getInputs",newKey,playerId);
+				} else if(keyCode === 68 ||keyCode === 39){
+					newKey = "right";
+					socket.emit("getInputs",newKey,playerId);
+				}
+			}
+		}
+	}
+
+	//Update Canvas -------------------------------------------------------------
+
+	function drawObjects(){
+		let colour;
+		gameCanvas.background('#FFF');
+		leftCanvas.background(backgroundColour);
+		rightCanvas.background(backgroundColour);
+		image(gameCanvas,(width-gameDimension)/2,(height-gameDimension)/2);
+
+		leftCanvas.textStyle(BOLD);
+		leftCanvas.textSize(100);
+		leftCanvas.text("Snake",sideWidth / 2, gameDimension / 14);
+		leftCanvas.text("Hunt", sideWidth / 2, gameDimension / 4);
+
+		leftCanvas.textSize(50);
+		leftCanvas.text("Controls",sideWidth / 2, 7.3 * gameDimension / 15);
+		leftCanvas.textStyle(NORMAL);
+		leftCanvas.textSize(30);
+		leftCanvas.text("SPACE - start",sideWidth / 2, 9 * gameDimension / 15);
+		leftCanvas.text("W - up",sideWidth / 2, 10 * gameDimension / 15);
+		leftCanvas.text("A - left",sideWidth / 2, 11 * gameDimension / 15);
+		leftCanvas.text("S - down",sideWidth / 2, 12 * gameDimension / 15);
+		leftCanvas.text("D - right",sideWidth / 2, 13 * gameDimension / 15);
+		leftCanvas.text("Or use arrow keys",sideWidth / 2, 14 * gameDimension / 15);
+
+		image(leftCanvas,20,20);
+
+		rightCanvas.textStyle(BOLD);
+		rightCanvas.textSize(60);
+		rightCanvas.fill(255);
+		rightCanvas.text("Scores:",sideWidth / 2, gameDimension / 18);
+		rightCanvas.textStyle(NORMAL);		
+		rightCanvas.textSize(40);
+		rightCanvas.stroke(255);
+		rightCanvas.strokeWeight(2); 
+		if(scores != null){
+			for(let i=0; i<scores.length; i++){
+				rightCanvas.fill(getHexValue(scores[i][1]));
+				rightCanvas.text(scores[i][0] + " : " + scores[i][2], sideWidth / 2, gameDimension * (i+2) / 10);
+			}
+		}
+
+		image(rightCanvas,40+sideWidth+gameDimension,20);
+
+		stroke(255);
+		strokeWeight(2);
+		noFill();
+		rect(20,20,sideWidth,gameDimension,30,0,0,30);
+		rect(60+sideWidth+gameDimension,20,sideWidth,gameDimension,0,30,30,0);
+		noStroke();
+
+		stroke(0);
+		strokeWeight(1);
+		noFill();
+		let defaultx = 40 + sideWidth;
+		let defaulty = 20;
+		let gridLength = gameDimension / gridSize;
+		for(let i=0; i < gridSize; i++){
+			for(let j=0; j < gridSize; j++){
+				if(grid != null){
+					fill(getHexValue(grid[i][j]));
+				}
+				rect(defaultx + i * gridLength, defaulty + j * gridLength, gridLength,gridLength);
+				noFill();
+			}
+		}
+		noStroke();
+	}
+
+	//Socket Inputs ------------------------------------------------------------------------------------
+ 	
+ 	socket.on("enterError",function(errorMessage){
+ 		var error = document.getElementById("error");
+ 		if(errorMessage == "dupusername"){
+ 			error.innerHTML = "Username already taken";
+ 		} else if(errorMessage == "nousername"){
+ 			error.innerHTML = "Please enter a username";
+ 		}
+ 	});
+
+ 	socket.on("displayColour",function(colours){
+ 		colourId = colours[0];
+ 		boxColour = getHexValue(colours[1]);
+ 		newDisplayColour(boxColour);
+ 	});
+
+ 	socket.on("initPlayer",function(id,start){
+		playerId = id;
+		let loginPage = document.getElementById("login");
+		loginPage.style.display = "none";
+		game();
+		loggedIn = true;
+	});
+
+	socket.on("restart",function(){
+		isDead = false;
+		inGame = true;
+	});
+
+ 	socket.on("playerDead",function(){
+ 		isDead = true;
+ 	});
+
+	socket.on("updateGame",function(newGridSize,newGrid){
+		gridSize = newGridSize
+		grid = newGrid;
+	});
+
+	socket.on("updateScore",function(scorePack){
+		scores = scorePack;
+	});
+
+	socket.on("newGridSize",function(newGridSize){
+		gridSize = newGridSize;
+	});
+
+	//Main Game Loop -----------------------------------------------------------------------------------
+
+	setInterval(function(){
+		if(loggedIn){
+			drawObjects();
+		}
+	},1000/25);
+
+</script>

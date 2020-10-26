@@ -1,0 +1,68 @@
+body{
+	background-color:#050732;
+	display:flex;
+  	justify-content:center;
+ 	align-items:center;
+	margin: auto auto;
+	overflow: hidden;
+}
+
+#login{
+	align-items:center;
+	text-align:center;
+	font-family:'Nunito';
+	border-radius:25px;
+	border:2px solid white;
+	height:90%;
+	width:95%;
+	left:50%;
+	margin-left:5%;
+}
+
+#title{
+	color:#FFFFFF;
+	font-size:110px;
+	padding:none;
+	margin:none;
+}
+
+#enterName{
+	color:white;
+	background-color:#555782;
+	border-radius:50px;
+	outline:none;
+	font-size:50px;
+	text-align:center;
+	width:35%;
+	padding:none;
+	margin:none;
+	top:5%;
+}
+
+#loginButton{
+	border:1.5px solid;
+	border-color:white;
+	background-color:#353762;
+	width:15%;
+	border-radius:40px;
+	color:#FFFFFF;
+	font-size:50px;
+	outline:none;
+}
+
+#loginButton:hover{
+	background-color:#555782;
+}
+
+#button{
+	fill:white;
+}
+
+a polygon{
+	fill:#353762
+}
+
+a:hover polygon{
+	fill:#555782;
+}
+

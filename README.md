@@ -13,9 +13,8 @@ Link: https://snakehunt.herokuapp.com/
 - Winner has the most points by the end of the game, good luck!
 
 ## How It Was Made
-This game uses HTML, CSS and Javascript - it is hosted using Node.js and the graphics were created using p5.js. 
 
-It is being hosted on Keroku but all the files have been transfered to the GitHub page as well. 
+This game uses HTML, CSS and Javascript - it is hosted on Heroku using Node.js as the backend and the graphics were created using p5.js.
 
 ## Why Was It Made
 

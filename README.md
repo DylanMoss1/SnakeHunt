@@ -32,7 +32,7 @@ The game also lags when multiple people join - this is probably due to the fact 
 
 ## Conclusion
 
-Overall, this was a very fun game to make and I learnt many new skills. I am moving on to learn more front-end web development using React JS and hopefully I can combine these 2 skills in the future to improve this project in the future.  
+Overall, this was a very fun game to make and I learnt many new skills. I am moving on to learn more front-end web development using React and hopefully I can combine these 2 skills in the future to improve this project in the future.  
 
 
 

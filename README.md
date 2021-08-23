@@ -1,5 +1,5 @@
 # SnakeHunt
-Multiplayer Javascript game made with NodeJS
+Multiplayer Javascript game made with Node.js
 
 Link: https://snakehunt.herokuapp.com/
 

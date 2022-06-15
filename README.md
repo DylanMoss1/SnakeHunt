@@ -1,8 +1,6 @@
 # SnakeHunt
 Multiplayer Javascript game made with Node.js
 
-Link: https://snakehunt.herokuapp.com/
-
 ## How To Play
 - At least 2 players need to connect to the game to start
 - Press the space key to begin the game
